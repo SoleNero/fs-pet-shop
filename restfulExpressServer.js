@@ -2,6 +2,7 @@
 
 var express = require('express');
 var app = express();
+
 var fs = require('fs');
 var path = require('path');
 var petsPath = path.join(__dirname, 'pets.json');
@@ -12,38 +13,52 @@ app.use(morgan('short'));
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
-var pets = fs.readFile(petsPath, 'utf8', function(err, data) {
-  pets = JSON.parse(data);
-  if (err) {
-    throw err;
-  }
-});
+// var pets = fs.readFile(petsPath, 'utf8', function(err, data) {
+//   pets = JSON.parse(data);
+//   if (err) {
+//     throw err;
+//   }
+// });
 
 
 app.get('/pets', function(req, res) {
-  res.send(pets);
-  res.sendStatus(200).send('OK');
+  fs.readFile(petsPath, 'utf8', function(err, data) {
+    var pets = JSON.parse(data);
+    if (err) {
+      throw err;
+    }
+    res.send(pets);
+  });
 });
 
 
 app.get('/pets/:index', function(req, res) {
   var index = Number.parseInt(req.params.index);
   // console.log(index);
-
+  fs.readFile(petsPath, 'utf8', function(err, data) {
+    var pets = JSON.parse(data);
+    if (err) {
+      throw err;
+    }
   if (Number.isNaN(index) || index < 0 || index >= pets.length) {
     return res.sendStatus(404);
   }
-
   res.send(pets[index]);
+  });
 });
 
 
 app.post('/pets', function(req, res) {
  var pet = {
-     age : req.body.age,
+     age : Number(req.body.age),
      kind : req.body.kind,
      name : req.body.name
    };
+   fs.readFile(petsPath, 'utf8', function(err, data) {
+     var pets = JSON.parse(data);
+     if (err) {
+       throw err;
+     }
 
  if (!req.body.age || !req.body.kind || !req.body.name) {
    return res.sendStatus(400);
@@ -51,6 +66,7 @@ app.post('/pets', function(req, res) {
 
  pets.push(pet);
  var petsJSON = JSON.stringify(pets);
+
  fs.writeFile(petsPath, petsJSON, function(writeErr) {
    if (writeErr) {
      return res.sendStatus(500);
@@ -58,12 +74,18 @@ app.post('/pets', function(req, res) {
 
  });
  res.send(pet);
+ });
 });
 
 
 
 app.put('/pets/:index', function(req, res) {
   var index = Number.parseInt(req.params.index);
+  fs.readFile(petsPath, 'utf8', function(err, data) {
+    var pets = JSON.parse(data);
+    if (err) {
+      throw err;
+    }
 
   if (Number.isNaN(index) || index < 0 || index >= pets.length) {
     return res.sendStatus(404);
@@ -81,6 +103,7 @@ app.put('/pets/:index', function(req, res) {
     }
   });
   res.send(pet);
+  });
 });
 
 
@@ -88,6 +111,11 @@ app.put('/pets/:index', function(req, res) {
 app.delete('/pets/:index', function(req, res) {
   var index = Number.parseInt(req.params.index);
 
+  fs.readFile(petsPath, 'utf8', function(err, data) {
+    var pets = JSON.parse(data);
+    if (err) {
+      throw err;
+    }
   if (Number.isNaN(index) || index < 0 || index >= pets.length) {
     return res.sendStatus(404);
   }
@@ -101,9 +129,8 @@ app.delete('/pets/:index', function(req, res) {
           return res.sendStatus(500);
         }
       });
-
-
-  res.send(pet);
+   res.send(pet);
+  });
 });
 
 
