@@ -13,12 +13,6 @@ app.use(morgan('short'));
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
-// var pets = fs.readFile(petsPath, 'utf8', function(err, data) {
-//   pets = JSON.parse(data);
-//   if (err) {
-//     throw err;
-//   }
-// });
 
 
 app.get('/pets', function(req, res) {
